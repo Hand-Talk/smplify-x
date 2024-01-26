@@ -42,6 +42,7 @@ torch.backends.cudnn.enabled = False
 
 
 def main(**args):
+    pkl_counter = 0
     output_folder = args.pop('output_folder')
     output_folder = osp.expandvars(output_folder)
     if not osp.exists(output_folder):
@@ -216,8 +217,8 @@ def main(**args):
                 if person_id >= max_persons and max_persons > 0:
                     continue
 
-                curr_result_fn = osp.join(curr_result_folder,
-                                          '{:03d}.pkl'.format(person_id))
+                curr_result_fn = osp.join(result_folder, '{:04d}.pkl'.format(pkl_counter))
+                pkl_counter += 1
                 curr_mesh_fn = osp.join(curr_mesh_folder,
                                         '{:03d}.obj'.format(person_id))
 

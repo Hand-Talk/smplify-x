@@ -467,10 +467,11 @@ def fit_single_frame(img,
             # orientations, if they exist
             result = {'camera_' + str(key): val.detach().cpu().numpy()
                       for key, val in camera.named_parameters()}
-            result.update({key: val.detach().cpu().numpy()
-                           for key, val in body_model.named_parameters()})
-            if use_vposer:
-                result['body_pose'] = pose_embedding.detach().cpu().numpy()
+            body_model_forward = body_model.forward(body_pose=vposer.decode(pose_embedding,output_type='aa').view(1, -1) if use_vposer else None)
+            result.update({key: val.detach().cpu().numpy() for key, val in body_model_forward.items() if val is not None})
+            result.update({key: val.detach().cpu().numpy() for key, val in body_model.named_parameters() if key not in result})
+            # reshape body_pose for SMPLX-blender
+            result['body_pose'] = result['body_pose'].reshape((1,-1))
 
             results.append({'loss': final_loss_val,
                             'result': result})
